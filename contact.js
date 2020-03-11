@@ -33,17 +33,17 @@ function start() {
             ]
         })
         .then(function(answer) {
-            switch (answer.action) {
+            switch (answer.question) {
                 case "View All Employees":
-                    viewAll();
+                    viewAllEmployees();
                     break;
 
                 case "View All Employees By Department":
-                    viewAllByDp();
+                    viewAllByDpt();
                     break;
 
                 case "View All Employees By Manager":
-                    viewAllByM();
+                    viewAllByManager();
                     break;
 
                 case "Add Employee":
@@ -55,30 +55,86 @@ function start() {
                     break;
 
                 case "Update Employee Role":
-                    updateEmRole();
+                    updateEmployeeRole();
                     break;
 
                 case "Update Employee Manager":
-                    updateManager();
+                    updateEmployeeManager();
                     break;
 
                 case "exit":
-                    exit();
-                    break;
+                    connection.end();
             }
-        })
+        });
 
 }
 
-function viewAll() {
+function viewAllEmployees() {
     //* is everthing
     var query = "SELECT * FROM employee";
     connection.query(query, function(err, res) {
+        if (err) throw err;
         console.table(res);
     })
     start();
 }
 
 function addEmployees() {
-    var query = "SELECT first_name, last_name FROM employee ";
+    console.log("Add employee");
+    inquirer
+        .prompt([{
+                name: "firstname",
+                type: "input",
+                message: "What is the employee's first name?",
+            },
+            {
+                name: "lastname",
+                type: "input",
+                message: "What is the employee's last name?",
+            },
+            {
+                name: "roleId",
+                type: "lists",
+                message: "Assign a role ID?",
+                choices: [1, 2, 3, 4, 5, 6]
+            },
+            {
+                name: "managerId",
+                type: "lists",
+                message: "Assign a manager ID",
+                choices: [1, 2]
+            }
+        ])
+        .then(function(response) {
+            connection.query(
+                "INSERT INTO employee (first_name, last_name, role_id, manager_id) values(?, ?, ?, ?)", [
+                    response.firstname,
+                    response.lastname,
+                    response.roleId,
+                    response.managerId
+                ],
+                function(err, res) {
+                    if (err) throw err;
+                    console.table(res);
+                }
+            )
+            start();
+        })
 }
+
+function updateEmployeeRole() {
+    console.log("Update employee roles");
+    var query = connection.query(
+        "UPDATE employee_role SET ? WHERE ?", [
+
+        ]
+    )
+}
+
+
+
+// function rmEmployees(){
+//     console.log("Remove employee");
+//     inquirer
+//         .prompt("Which employee do you want to remove?")
+// }
