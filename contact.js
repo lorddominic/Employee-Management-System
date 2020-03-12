@@ -200,30 +200,41 @@ function addRoles() {
 }
 
 function rmEmployees() {
-    console.log("Remove employee");
-    inquirer
-        .prompt([{
-                type: "input",
-                name: "remove",
-                message: "Which employee do you want to remove?"
-            } //how to use list to handle this
-        ])
-        .then(function(response) {
-            connection.query(
-                "DELETE FROM employee (first_name) WHERE first_name = (?)", [
-                    response.remove
-                ],
-                function(err, res) {
-                    if (err) throw err;
-                    console.table(res);
-                    viewAllEmployees();
-                }
-            )
-        })
+    var query = "SELECT * FROM employee";
+    connection.query(query, function(err, employees) {
+        if (err) throw err;
+        inquirer
+            .prompt([{
+                    type: "list",
+                    name: "remove",
+                    message: "Which employee do you want to remove?",
+                    choices: function() {
+                        return employees.map(employee => ({
+                            name: employee.first_name + " " + employee.last_name,
+                            value: employee.id
+                        }));
+                    }
+                } //how to use list to handle this
+            ])
+            .then(function(response) {
+                connection.query(
+                    "DELETE FROM employee WHERE id = ?", [
+                        response.remove
+                    ],
+                    function(err, res) {
+                        if (err) throw err;
+                        console.table(res);
+                        viewAllEmployees();
+                    }
+                )
+            })
+    });
+
 }
 
 function updateEmployeeRole() {
     console.log("Update employee roles");
+
     inquirer
         .prompt([{
                 type: "input",
@@ -231,7 +242,7 @@ function updateEmployeeRole() {
                 message: "Update employee id"
             },
             {
-                type: "choices",
+                type: "list",
                 name: "role_id",
                 message: "Update position id",
                 choices: [1, 2, 3, 4, 5, 6]
@@ -239,7 +250,12 @@ function updateEmployeeRole() {
         ])
         .then(function(res) {
             connection.query(
-                "UPDATE employee SET "
+                "UPDATE employee SET role_id = ? WHERE id = ?", [
+                    res.role_id, res.id
+                ],
+                function(err, result) {
+                    viewAllEmployees();
+                }
             )
         })
 }
