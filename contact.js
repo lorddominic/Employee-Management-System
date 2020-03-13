@@ -231,72 +231,72 @@ function rmEmployees() {
 
 }
 
-function updateEmployeeRole() {
-    console.log("Update employee roles");
-
-    inquirer
-        .prompt([{
-                type: "input",
-                name: "id",
-                message: "Update employee id"
-            },
-            {
-                type: "list",
-                name: "role_id",
-                message: "Update position id",
-                choices: [1, 2, 3, 4, 5, 6]
-            }
-        ])
-        .then(function(res) {
-            connection.query(
-                "UPDATE employee SET role_id = ? WHERE id = ?", [
-                    res.role_id, res.id
-                ],
-                function(err, result) {
-                    viewAllEmployees();
-                }
-            )
-        })
-}
 // function updateEmployeeRole() {
 //     console.log("Update employee roles");
-//     var query = "SELECT * FROM employee_role";
-//     connection.query(query, function(err, employeeR) {
-//         if (err) throw err;
-//         inquirer
-//             .prompt([{
-//                     type: "list",
-//                     name: "role_id",
-//                     message: "Which employee role do you want to update?",
-//                     choices: function() {
-//                         return employeeR.map(role => ({
-//                             name: role.title,
-//                             value: role.id
-//                         }));
-//                     }
-//                 },
-//                 {
-//                     type: "input",
-//                     name: "title",
-//                     message: "What do you want to change the title to?"
-//                 },
-//                 {
-//                     type: "input",
-//                     name: "salary",
-//                     message: "Mow much do you want to change the salary to?"
-//                 }
 
-//             ])
-//             .then(function(res) {
-//                 connection.query(
-//                     "UPDATE employee SET title = ? salary = ? WHERE id = ?", [
-//                         res.title, res.salary, value
-//                     ],
-//                     function(err, result) {
-//                         if (err) throw err;
-//                         viewAllRoles();
-//                     }
-//                 )
-//             })
-//     })
+//     inquirer
+//         .prompt([{
+//                 type: "input",
+//                 name: "id",
+//                 message: "Update employee id"
+//             },
+//             {
+//                 type: "list",
+//                 name: "role_id",
+//                 message: "Update position id",
+//                 choices: [1, 2, 3, 4, 5, 6]
+//             }
+//         ])
+//         .then(function(res) {
+//             connection.query(
+//                 "UPDATE employee SET role_id = ? WHERE id = ?", [
+//                     res.role_id, res.id
+//                 ],
+//                 function(err, result) {
+//                     viewAllEmployees();
+//                 }
+//             )
+//         })
 // }
+function updateEmployeeRole() {
+    console.log("Update employee roles");
+    var query = "SELECT * FROM employee";
+    connection.query(query, function(err, employeeObject) {
+        if (err) throw err;
+        inquirer
+            .prompt([{
+                    type: "list",
+                    name: "role_id",
+                    message: "Which employee's role do you want to update?",
+                    choices: function() {
+                        return employeeObject.map(employee => ({
+                            name: employee.first_name + " " + employee.last_name,
+                            value: employee.id
+                        }));
+                    }
+                },
+                {
+                    type: "input",
+                    name: "title",
+                    message: "What do you want to change the title to?"
+                },
+                {
+                    type: "input",
+                    name: "salary",
+                    message: "Mow much do you want to change the salary to?"
+                }
+
+            ])
+            .then(function(res) {
+                connection.query(
+                    "UPDATE employee SET title = ? salary = ? WHERE id = ?", [
+                        res.title, res.salary, res.role_id
+                    ],
+                    function(err, result) {
+                        if (err) throw err;
+                        viewAllRoles();
+                    }
+                )
+            })
+    })
+}
